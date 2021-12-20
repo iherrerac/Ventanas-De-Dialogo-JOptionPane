@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.border.Border;
+import java.awt.Component;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -44,7 +45,7 @@ class Panel extends JPanel{
 	public Panel() {
 		setLayout(new BorderLayout());
 		panelNorte = new JPanel(new GridLayout(2,3));
-		panelSur = new JPanel();//TODO revisar, no se si hace falta  este panel
+		panelSur = new JPanel();
 		
 		//Inicializacion grupoRB
 		grupoRB1 = new ButtonGroup();
@@ -63,7 +64,7 @@ class Panel extends JPanel{
 		Box CajaV6 = Box.createVerticalBox();
 		
 		add(panelNorte,BorderLayout.CENTER);
-		add(panelSur,BorderLayout.SOUTH);//TODO revisar, no se si hace falta  este panel
+		add(panelSur,BorderLayout.SOUTH);
 		
 		panelNorte.add(CajaV1);
 		panelNorte.add(CajaV2);
@@ -79,7 +80,10 @@ class Panel extends JPanel{
 		icono= new ImageIcon("src/icono.jpg");
 		combo= new JComboBox(textoTipoRB);
 		fecha = new Date();
-		Object[] mensajeArray = {mensaje,icono,combo,fecha};
+		opcionConfirmar =-1;
+		opcionArray = new Object[] {"Boton1","Boton2","Boton3"};
+		entrada = "Campo de texto";
+		
 		
 		for (int i = 0; i < textoTipoRB.length; i++) {
 			CreaRadioButtons(textoTipoRB[i],CajaV1,grupoRB1,i);
@@ -110,16 +114,26 @@ class Panel extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				switch (tipo) {
-				//TODO Establecer opciones boton
+				// Establecer opciones boton
 				case "Mensaje":
-					if(mensaje.equals(1) ) {
-						JOptionPane.showMessageDialog(panelSur, mensajeArray, "Titulo: "+tituloCaja, tipoMensaje);
-					} else JOptionPane.showMessageDialog(panelSur, mensaje, "Titulo: "+tituloCaja, tipoMensaje);
+					JOptionPane.showMessageDialog(panelSur, mensaje, "Titulo: "+tituloCaja, tipoMensaje);
 					break;
+					
 				case "Confirmar":
-					JOptionPane.showConfirmDialog(panelSur, mensaje, "Titulo: "+tituloCaja, tipoMensaje);
+					JOptionPane.showConfirmDialog(panelSur, mensaje, "Titulo: "+tituloCaja, opcionConfirmar,tipoMensaje);
 					break;
-
+					
+				case "Opcion":
+					JOptionPane.showOptionDialog(panelSur, mensaje, "Titulo: "+tituloCaja, opcionConfirmar, tipoMensaje, null, opcionArray, opcionArray[0]);
+					break;
+					
+				case "Entrada":
+					System.out.println(entrada);
+					if (entrada.equalsIgnoreCase("Campo de texto")) {
+					JOptionPane.showInputDialog(panelSur, mensaje, "Titulo: "+tituloCaja, tipoMensaje);
+					}else {JOptionPane.showInputDialog(panelSur, mensaje, "Titulo: "+tituloCaja, tipoMensaje, null,new Object[] {"Opcion1","Opcion2","Opcion3"},"Opcion1");}
+					break;
+					
 				default:
 					break;
 				}
@@ -141,7 +155,7 @@ class Panel extends JPanel{
 			}
 			grupoRB.add(botonRB);
 			botonRB.addActionListener(new ActionListener() {
-				//TODO Opciones RadioButtons
+				//Opciones RadioButtons
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					//seleccion de tipo
@@ -170,7 +184,7 @@ class Panel extends JPanel{
 								mensaje="Establecida opcion Cadena de texto de prueba";
 								break;
 							case "Icono":
-								mensaje=icono;
+								mensaje=new Object[] {new ImageIcon ("src/verde.png"),new ImageIcon ("src/azul.png"),new ImageIcon("src/naranja.png")};
 								break;
 							case "Componente":
 								mensaje=combo;
@@ -179,7 +193,7 @@ class Panel extends JPanel{
 								mensaje=fecha;
 								break;
 							case "Object[]":
-								mensaje = 1;
+								mensaje = new Object[] {mensaje,icono,combo,fecha};
 								break;
 								
 							default:
@@ -189,6 +203,49 @@ class Panel extends JPanel{
 						}
 					}
 					
+					//Seleccion opcion Confirmar
+					for (int j = 0; j < textoConfirmarRB.length; j++) {
+						if (textoConfirmarRB[j].equalsIgnoreCase(e.getActionCommand())){
+							System.out.println("JOptionPane."+(e.getActionCommand()));
+							if (e.getActionCommand().equalsIgnoreCase("confirmar")){
+							} else opcionConfirmar=valorOpcionConfirmar[j-1];
+						}
+					}	
+					
+					//Seleccion opcion botones Confirmar
+					for (int j = 0; j < textoOpcionRB.length; j++) {
+						if (textoOpcionRB[j].equalsIgnoreCase(e.getActionCommand())){
+							System.out.println("JOptionPane."+(e.getActionCommand()));
+							switch (e.getActionCommand()) {
+							case "String[]":
+								opcionArray= stringArray;
+								break;
+								
+							case "Icon[]":
+								opcionArray= iconArray;
+								break;
+								
+							case "Object[ ]":
+								//TODO tenido que cambiarle el nombre a la opcion 
+								//para no sobrescribir la de Texto Mensaje. Revisar
+								opcionArray= new Object[] {new ImageIcon ("src/verde.png"),fecha};
+								//opcionArray= objectArray.clone();
+								//opcionArray= new Object[] {objectArray};
+								break;
+
+							default:
+								break;
+							}
+						}
+					}	
+					
+					//Seleccion opcion Entrada
+					for (int j = 0; j < textoEntradaRB.length; j++) {
+						if (e.getActionCommand().equalsIgnoreCase(textoEntradaRB[j])){
+							System.out.println("JOptionPane."+(e.getActionCommand()));
+							entrada=e.getActionCommand().toString();
+						}
+					}	
 				}
 				
 			});
@@ -208,24 +265,40 @@ class Panel extends JPanel{
 	ButtonGroup grupoRB4;
 	ButtonGroup grupoRB5;
 	ButtonGroup grupoRB6;
+	
 	//Grupo RadioButton
 	private JRadioButton botonRB;
+	
 	//Menus RadioButtons
 	private String [] textoTipoRB  = {"Tipo","Mensaje","Confirmar","Opcion","Entrada"};
 	private String [] textoTipoMensajeRB  = {"Tipo Mensaje","ERROR_MESSAGE","INFORMATION_MESSAGE","WARNING_MESSAGE","QUESTION_MESSAGE","PLAIN_MESSAGE"};
 	private int [] valorTipoMensaje  = {0,1,2,3,-1};
 	private String [] textoMensajeRB  = {"Mensaje","Cadena","Icono","Componente","Otros","Object[]"};
 	private String [] textoConfirmarRB  = {"Confirmar","DEFAULT_OPTION","YES_NO_OPTION","YES_NO_CANCEL_OPTION","OK_CANCEL_OPTION"};
-	private String [] textoOpcionRB  = {"Opcion","String[]","Icon[]","Object[]"};
-	private String [] textoEntradaRB  = {"Entrada","Campo de texto","Combo"};
-		
+	private int [] valorOpcionConfirmar  = {-1,0,1,2};
+	private String [] textoOpcionRB  = {"Opcion","String[]","Icon[]","Object[ ]"};
+	private String [] textoEntradaRB  = {"Entradas","Campo de texto","Combo"};
+	
+	
 	private String tituloCaja;
 	private String tipo;
+	
+	//parametros showMessageDialog
 	private int tipoMensaje;
-	private Object mensaje;
 	private ImageIcon icono;
 	private JComboBox combo;
 	private Date fecha;
-	private Object[] mensajeArray;
+	private Object mensaje;
+	//parametros showOptionDialog menu confirmar
+	private int opcionConfirmar;
 	
+	//parametros showOptionDialog menu opcion (para opcion Object[] utilizaremos mensajeArray)
+	
+	
+	private Object[] opcionArray;
+    private String[] stringArray = {"Boton1","Boton2","Boton3"};
+	private ImageIcon[] iconArray = {new ImageIcon ("src/verde.png"),new ImageIcon ("src/azul.png"),new ImageIcon("src/naranja.png")};
+	private Object[] objectArray = {new ImageIcon ("src/verde.png"),fecha};
+	
+	private String entrada;
 }
